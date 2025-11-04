@@ -13,11 +13,6 @@ declare global {
 
 const mongodb_uri = process.env.MONGODB_URI;
 
-// todo: validate MongoDB available or !
-if (!mongodb_uri) {
-  throw new Error("mongodb uri is not available in the env or is not valid");
-}
-
 // todo: initialize  the cache on global object to persist across hot reloads in development.
 const cached: MongooseCache = global.mongoose || { conn: null, promise: null };
 
@@ -34,6 +29,12 @@ async function connectDB(): Promise<typeof mongoose> {
 
   // todo: return existing connection promise if one is in progress
   if (!cached.promise) {
+    // todo: validate MongoDB available or !
+    if (!mongodb_uri) {
+      throw new Error(
+        "mongodb uri is not available in the env or is not valid"
+      );
+    }
     const options = {
       bufferCommands: false,
     };
