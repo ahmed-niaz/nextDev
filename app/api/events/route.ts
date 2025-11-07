@@ -3,6 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import connectDB from "@/lib/mongodb";
 import { Event } from "@/database";
 
+// todo : POST method
 export async function POST(req: NextRequest) {
   try {
     await connectDB;
@@ -35,6 +36,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // todo: for tags & agenda
+    const tags = JSON.parse(formData.get("tags") as string);
+    const agenda = JSON.parse(formData.get("agenda") as string);
+
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -53,7 +58,11 @@ export async function POST(req: NextRequest) {
     event.image = (uploadImage as { secure_url: string }).secure_url;
 
     // todo: if properly parse formData then create an event into DB
-    const createdEvent = await Event.create(event);
+    const createdEvent = await Event.create({
+      ...event,
+      tags: tags,
+      agenda: agenda,
+    });
 
     return NextResponse.json(
       {
@@ -68,6 +77,32 @@ export async function POST(req: NextRequest) {
       {
         message: "Event Creation Failed",
         error: e instanceof Error ? e.message : "Unknown",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// todo: GET method
+export async function GET() {
+  try {
+    // todo: connect database
+    await connectDB;
+
+    const events = await Event.find().sort({ createdAt: -1 });
+    return NextResponse.json(
+      {
+        message: "Events fetched successfully",
+        events,
+      },
+      { status: 200 }
+    );
+  } catch (e) {
+    return NextResponse.json(
+      {
+        message: "Event fetching failed",
+        error: e instanceof Error ? e.message : String(e),
+        details: "Invalid JSON data",
       },
       { status: 500 }
     );

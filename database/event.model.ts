@@ -114,7 +114,7 @@ const EventSchema = new Schema<IEvent>(
 EventSchema.pre("save", function (next) {
   const event = this as IEvent;
 
-  // Generate slug only if title changed or document is new
+  // todo: Generate slug only if title changed or document is new
   if (event.isModified("title") || event.isNew) {
     event.slug = generateSlug(event.title);
   }
