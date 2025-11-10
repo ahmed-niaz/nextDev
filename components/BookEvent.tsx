@@ -10,8 +10,6 @@ const BookEvent = ({ slug }: BookEventProps) => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  console.log(slug);
-
   const handleBooking = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -28,7 +26,6 @@ const BookEvent = ({ slug }: BookEventProps) => {
 
       if (response.ok) {
         setSubmitted(true);
-        console.log("Booking successful:", { email, slug });
       } else {
         console.error("Booking failed");
         // Handle error - you might want to show an error message

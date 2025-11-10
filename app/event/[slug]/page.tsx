@@ -30,11 +30,8 @@ const EventDetails = async ({
       audience,
       tags,
       organizer,
-      _id,
     },
   } = await request.json();
-
-  console.log(_id);
 
   if (!description) return notFound();
   const bookings = 10;

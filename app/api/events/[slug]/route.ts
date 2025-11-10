@@ -103,13 +103,10 @@ export async function POST(req: NextRequest, { params }: RoutesParams) {
     }
 
     const eventId = event?._id;
-    console.log("Event found - ID:", eventId);
 
     // Get form data
     const formData = await req.formData();
     const email = formData.get("email") as string;
-
-    console.log("Form data received:", { email });
 
     // Validate email
     if (!email || typeof email !== "string" || email.trim() === "") {
@@ -124,10 +121,8 @@ export async function POST(req: NextRequest, { params }: RoutesParams) {
       email: email.trim().toLowerCase(),
       eventId: eventId,
     };
-    console.log(bookingData);
-    const newBooking = await Booking.create(bookingData);
 
-    console.log("Booking created:", newBooking);
+    const newBooking = await Booking.create(bookingData);
 
     return NextResponse.json(
       {

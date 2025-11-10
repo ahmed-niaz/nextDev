@@ -129,10 +129,6 @@ const CreateEvents = () => {
       if (!response.ok) {
         throw new Error(data.error || data.message || "Failed to create event");
       }
-
-      // console.log("Event created:", data);
-      setSuccess(true);
-
       setFormData({
         title: "",
         description: "",
