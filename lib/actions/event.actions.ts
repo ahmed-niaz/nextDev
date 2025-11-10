@@ -13,10 +13,10 @@ export const getSimilarEventBySlug = async (slug: string) => {
       return [];
     }
 
-    const similarEvents = await Event.find({
+    const similarEvents = (await Event.find({
       _id: { $ne: event._id },
       tags: { $in: event.tags },
-    }).lean();
+    }).lean()) as IEvent[];
 
     return similarEvents;
   } catch (error) {

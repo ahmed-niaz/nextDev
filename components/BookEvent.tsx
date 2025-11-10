@@ -1,15 +1,44 @@
 "use client";
 import { useState } from "react";
 
-const BookEvent = () => {
+interface BookEventProps {
+  slug: string;
+}
+
+const BookEvent = ({ slug }: BookEventProps) => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  console.log(slug);
+
+  const handleBooking = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setTimeout(() => setSubmitted(true), 1000);
-    console.log(e);
-    console.log(email);
+    setLoading(true);
+    try {
+      const formDataToSend = new FormData();
+
+      formDataToSend.append("email", email);
+
+      // todo: send booking data to the api
+      const response = await fetch(`/api/events/${slug.toLowerCase()}`, {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        console.log("Booking successful:", { email, slug });
+      } else {
+        console.error("Booking failed");
+        // Handle error - you might want to show an error message
+      }
+    } catch (e) {
+      console.error("Error submitting booking:", e);
+      // Handle error
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -17,7 +46,7 @@ const BookEvent = () => {
       {submitted ? (
         <p className="text-sm">🎉 You’re in! Thanks for signing up</p>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleBooking}>
           <div>
             <label htmlFor="email">Email Address</label>
             <input

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import { Event } from "@/database";
+import { Booking, Event } from "@/database";
 
 type RoutesParams = {
   params: Promise<{
@@ -70,6 +70,84 @@ export async function GET(
     return NextResponse.json(
       { message: "an unexpected error occurred" },
       { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest, { params }: RoutesParams) {
+  try {
+    // Connect to database
+    await connectDB;
+
+    // Extract slug from params
+    const { slug } = await params;
+
+    // Validate slug parameter
+    if (!slug || typeof slug !== "string" || slug.trim() === "") {
+      return NextResponse.json(
+        { message: "Invalid slug parameter" },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize slug
+    const sanitizedSlug = slug.trim().toLowerCase();
+
+    // Query event by slug
+    const event = await Event.findOne({
+      slug: sanitizedSlug,
+    }).lean();
+
+    if (!event) {
+      return NextResponse.json({ message: "Event not found" }, { status: 404 });
+    }
+
+    const eventId = event?._id;
+    console.log("Event found - ID:", eventId);
+
+    // Get form data
+    const formData = await req.formData();
+    const email = formData.get("email") as string;
+
+    console.log("Form data received:", { email });
+
+    // Validate email
+    if (!email || typeof email !== "string" || email.trim() === "") {
+      return NextResponse.json(
+        { message: "Email is required" },
+        { status: 400 }
+      );
+    }
+
+    // Create booking with email and event data
+    const bookingData = {
+      email: email.trim().toLowerCase(),
+      eventId: eventId,
+    };
+    console.log(bookingData);
+    const newBooking = await Booking.create(bookingData);
+
+    console.log("Booking created:", newBooking);
+
+    return NextResponse.json(
+      {
+        message: "Booking created successfully",
+        booking: {
+          id: newBooking._id,
+          email: newBooking.email,
+          eventId: newBooking.eventId,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (e) {
+    console.error("Booking error:", e);
+    return NextResponse.json(
+      {
+        message: "Failed to create booking",
+        error: e instanceof Error ? e.message : String(e),
+      },
+      { status: 400 }
     );
   }
 }

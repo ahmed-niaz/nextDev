@@ -3,7 +3,7 @@ import EventAgenda from "@/components/EventAgenda";
 import EventCard from "@/components/EventCard";
 import EventDetailsItem from "@/components/EventDetailsItem";
 import EventTags from "@/components/EventTags";
-import { IEvent } from "@/database";
+import { Booking, IEvent } from "@/database";
 import { getSimilarEventBySlug } from "@/lib/actions/event.actions";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -30,14 +30,17 @@ const EventDetails = async ({
       audience,
       tags,
       organizer,
+      _id,
     },
   } = await request.json();
+
+  console.log(_id);
 
   if (!description) return notFound();
   const bookings = 10;
 
   // todo: render slug using server;
-  const similarEvents = await getSimilarEventBySlug(slug);
+  const similarEvents: IEvent[] = await getSimilarEventBySlug(slug);
 
   return (
     <section id="event">
@@ -103,7 +106,7 @@ const EventDetails = async ({
               <p className="text-sm">Be the first to book your spot!</p>
             )}
 
-            <BookEvent />
+            <BookEvent slug={slug} />
           </div>
         </aside>
       </div>
